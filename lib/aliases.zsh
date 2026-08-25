@@ -37,11 +37,11 @@ alias oo='open .'
 alias term='open -a iterm.app'
 
 # Run scripts
-alias update="source $DOTFILES/scripts/update"
-alias bootstap="source $DOTFILES/scripts/bootstrap"
+alias update="$DOTFILES/scripts/update.sh"
+alias bootstrap="$DOTFILES/scripts/bootstrap.sh"
 
 # Quick jump to dotfiles
-alias dotfiles="code $DOTFILES"
+alias dotfiles="cd $DOTFILES"
 
 # Quick reload of zsh environment
 alias reload="source $HOME/.zshrc"
@@ -62,6 +62,7 @@ alias get="curl -O -L"
 alias ybw="yarn build:watch"
 alias yba="yarn build:all"
 alias ytw="yarn test:watch"
+alias ytu="yarn test:unit":
 
 # Use tldr as help util
 if _exists tldr; then
@@ -69,12 +70,20 @@ if _exists tldr; then
 fi
 
 alias git-root='cd $(git rev-parse --show-toplevel)'
+alias cdgr='git-root'
+
+# Avoid stupidity with trash-cli:
+# https://github.com/sindresorhus/trash-cli
+# or use default rm -i
+if _exists trash; then
+  alias rm='trash'
+fi
 
 # Better ls with icons, tree view and more
 # https://github.com/eza-community/eza
 if _exists eza; then
   unalias ls
-  alias ls='eza --icons --header --git'
+  alias ls='eza --icons --header --git --hyperlink'
   alias lt='eza --icons --tree'
   unalias l
   alias l='ls -l'
@@ -87,6 +96,8 @@ if _exists bat; then
   # Run to list all themes:
   #   bat --list-themes
   export BAT_THEME='base16'
+  export BAT_STYLE='full'
+  export MANPAGER='bat -plman'
   alias cat='bat'
 fi
 
@@ -94,4 +105,30 @@ fi
 # https://github.com/ajeetdsouza/zoxide
 if _exists zoxide; then
   alias cd='z'
+fi
+
+# Lazygit
+# https://github.com/jesseduffield/lazygit
+if _exists lazygit; then
+  alias lg='lazygit'
+fi
+
+# Glow
+# https://github.com/charmbracelet/glow
+if _exists glow; then
+  alias md='glow -t'
+fi
+
+# Claude Code
+# https://claude.ai/code
+if _exists claude; then
+  alias cc='claude'
+  alias ccx='cd ~/Projects/Playground && claude --dangerously-skip-permissions'
+fi
+
+# Codex
+# https://github.com/openai/codex
+if _exists codex; then
+  alias cx='codex'
+  alias cxx='codex -C ~/Projects/Playground --full-auto'
 fi

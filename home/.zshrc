@@ -1,5 +1,5 @@
 # Added by ForgeCode installer
-export PATH="/Users/aryan.singhal/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 # Amazon Q pre block. Keep at the top of this file.
 [[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # ------------------------------------------------------------------------------
@@ -35,22 +35,23 @@ set -o noclobber
 _extend_path() {
   [[ -d "$1" ]] || return
 
-  if ! $( echo "$PATH" | tr ":" "\n" | grep -qx "$1" ) ; then
+  if ! echo "$PATH" | tr ":" "\n" | grep -qx "$1" ; then
     export PATH="$1:$PATH"
   fi
 }
 
 # Add custom bin to $PATH
-_extend_path "$HOME/.local/bin"
-_extend_path "$DOTFILES/bin"
-_extend_path "$HOME/.npm-global/bin"
-_extend_path "$HOME/.rvm/bin"
-_extend_path "$HOME/.yarn/bin"
-_extend_path "$HOME/.config/yarn/global/node_modules/.bin"
-_extend_path "$HOME/.bun/bin"
+_extend_path "$HOME/.local/bin" # local bins
+_extend_path "$DOTFILES/bin" # custom scripts
+_extend_path "$HOME/.npm-global/bin" # npm global packages
+_extend_path "$HOME/.rvm/bin" # RVM
+_extend_path "$HOME/.yarn/bin" # Yarn
+_extend_path "$HOME/.config/yarn/global/node_modules/.bin" # Yarn global packages
+_extend_path "$HOME/.bun/bin" # Bun
+_extend_path "$HOME/.rd/bin" # Rancher Desktop
 
 # Extend $NODE_PATH
-if [ -d ~/.npm-global ]; then
+if [ -d "$HOME/.npm-global" ]; then
   export NODE_PATH="$NODE_PATH:$HOME/.npm-global/lib/node_modules"
 fi
 
@@ -90,7 +91,15 @@ export TIMEFMT=$'\n================\nCPU\t%P\nuser\t%*U\nsystem\t%*S\ntotal\t%*E
 # ------------------------------------------------------------------------------
 # Oh My Zsh
 # ------------------------------------------------------------------------------
-ZSH_DISABLE_COMPFIX=true
+export ZSH_DISABLE_COMPFIX=true
+
+# SSH agent lazy loading and quiet mode
+zstyle :omz:plugins:ssh-agent lazy yes
+zstyle :omz:plugins:ssh-agent quiet yes
+
+# NOTE: upstream also sets `zstyle ':omz:plugins:nvm' autoload true` here. Node
+# comes from asdf on this machine and the nvm plugin is not loaded, so it is
+# omitted deliberately.
 
 # Use passphase from macOS keychain
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -105,11 +114,11 @@ fi
 SPACESHIP_PROJECT="$HOME/Projects/Repos/spaceship/spaceship-prompt"
 
 # Reset zgen on change
-ZGEN_RESET_ON_CHANGE=(
-  ${HOME}/.zshrc
-  ${DOTFILES}/lib/*.zsh
+export ZGEN_RESET_ON_CHANGE=(
+  "${HOME}/.zshrc"
+  "${DOTFILES}"/lib/*.zsh
+  "${DOTFILES}"/custom/*.zsh
 )
-
 # Load zgen
 source "${HOME}/.zgen/zgen.zsh"
 
@@ -120,13 +129,16 @@ if ! zgen saved; then
     zgen oh-my-zsh
 
     # Oh-My-Zsh plugins
+    zgen oh-my-zsh plugins/brew
     zgen oh-my-zsh plugins/git
+    zgen oh-my-zsh plugins/tmux
     zgen oh-my-zsh plugins/history-substring-search
     zgen oh-my-zsh plugins/sudo
     zgen oh-my-zsh plugins/command-not-found
     zgen oh-my-zsh plugins/npm
     zgen oh-my-zsh plugins/yarn
     zgen oh-my-zsh plugins/fnm
+    zgen oh-my-zsh plugins/pyenv
     zgen oh-my-zsh plugins/extract
     zgen oh-my-zsh plugins/ssh-agent
     zgen oh-my-zsh plugins/gpg-agent
@@ -138,15 +150,28 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/docker-compose
     zgen oh-my-zsh plugins/node
     zgen oh-my-zsh plugins/deno
+    zgen oh-my-zsh plugins/bun
+    zgen oh-my-zsh plugins/tldr
+    zgen oh-my-zsh plugins/fzf
+
+    # Like cd but with z-zsh capabilities
+    if command -v zoxide >/dev/null 2>&1; then
+      zgen oh-my-zsh plugins/zoxide
+    fi
+
+    # Per-directory env vars
+    if command -v direnv >/dev/null 2>&1; then
+      zgen oh-my-zsh plugins/direnv
+    fi
 
     # Custom plugins
     zgen load chriskempson/base16-shell
     zgen load djui/alias-tips
-    zgen load marzocchi/zsh-notify
     zgen load hlissner/zsh-autopair
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-autosuggestions
-    
+    zgen load Aloxaf/fzf-tab
+
     # Files
     zgen load $DOTFILES/lib
     zgen load $DOTFILES/custom
@@ -177,25 +202,21 @@ fi
 # ship with the Homebrew formula.
 fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 
-# Like cd but with z-zsh capabilities
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
-fi
+# NOTE: zoxide is initialised by upstream's `plugins/zoxide` above, so it is
+# deliberately not re-initialised here.
 
 # ------------------------------------------------------------------------------
 # Load additional zsh files
 # ------------------------------------------------------------------------------
 
-# bun completions
-if [ -s "$HOME/.bun/_bun" ]; then
-  source "$HOME/.bun/_bun"
-  export BUN_INSTALL="$HOME/.bun"
-  export PATH="$BUN_INSTALL/bin:$PATH"
+# OpenAI Codex CLI completions
+if _exists codex; then
+  eval "$(codex completion zsh)"
 fi
 
-# Fuzzy finder bindings
-if [ -f "$HOME/.fzf.zsh" ]; then
-  source "$HOME/.fzf.zsh"
+# Bazel environment variables
+if [[ -f "$HOME/.bazelenv" ]]; then
+  source "$HOME/.bazelenv"
 fi
 
 # ------------------------------------------------------------------------------
@@ -212,7 +233,6 @@ fi
 # Amazon Q post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
 source /Users/aryan.singhal/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-eval "$(zoxide init zsh)"
 # Added by `rbenv init` on Thu Jan 16 11:24:55 IST 2025
 eval "$(rbenv init - --no-rehash zsh)"
 export PATH=/usr/local/bin:/Users/aryan.singhal/.rbenv/shims:/Users/aryan.singhal/.bun/bin:/Users/aryan.singhal/.bun/bin:/Users/aryan.singhal/.config/yarn/global/node_modules/.bin:/Users/aryan.singhal/.yarn/bin:/Users/aryan.singhal/.dotfiles/bin:/opt/homebrew/bin:/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:/Users/aryan.singhal/.rbenv/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/aryan.singhal/Library/Android/sdk/platform-tools:/Users/aryan.singhal/Library/Android/sdk/tools/bin:/Users/aryan.singhal/Library/Android/sdk/tools:/Users/aryan.singhal/Library/Android/sdk/emulator:/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/usr/local/go/bin

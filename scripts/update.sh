@@ -61,11 +61,19 @@ update_dotfiles() {
   ./install --except shell
   cd - > /dev/null 2>&1 || exit
 
-  info "Updating Zsh plugins..."
-  zgen selfupdate
-  zgen update
-
   finish
+}
+
+update_zgen() {
+  info "Updating Zgen and Zsh plugins..."
+
+  local zgen_source="${HOME}/.zgen/zgen.zsh"
+
+  if [[ ! -f "$zgen_source" ]]; then
+    "$DOTFILES/scripts/zgen.sh"
+  fi
+
+  zsh -c 'source "${HOME}/.zgen/zgen.zsh" && zgen selfupdate && zgen update'
 }
 
 update_brew() {
@@ -124,8 +132,9 @@ main() {
 
   on_start "$*"
   update_dotfiles "$*"
+  update_zgen "$*"
   update_brew "$*"
-  update_apt_get "$*"
+  update_apt "$*"
   on_finish "$*"
 }
 

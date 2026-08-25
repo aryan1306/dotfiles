@@ -11,6 +11,14 @@ custom/**/*.local.*sh
 # macOS
 .DS_Store
 
-# Home Configs
+# All configs
 home/.config/*
+home/.config/**/*
+!home/.config/**/
+
+# Exclude specific files from home/.config
+!home/.config/agents/AGENTS.md
 !home/.config/gh/config.yml
+!home/.config/ghostty/config
+!home/.config/husky/init.sh
+!home/.config/yazi/yazi.toml

@@ -4,6 +4,9 @@
 [color]
   ui = auto
 
+[column]
+  ui = auto
+
 [color "diff"]
   meta = white bold
   frag = cyan bold
@@ -15,17 +18,34 @@
   excludesfile = ~/.gitignore
   attributesfile = ~/.gitattributes
   ignorecase = false
-	compression = 0
+  pager = delta # brew install git-delta
+
+[branch]
+  sort = -committerdate
 
 [push]
   default = current
   autoSetupRemote = true
 
 [pull]
-  rebase = false
+  rebase = true
+
+[interactive]
+  diffFilter = delta --color-only
+
+# Automatically resolve conflicts
+# https://x.com/dillon_mulroy/status/1982514256340983981
+[rerere]
+  enabled = true
 
 [protocol "file"]
-	allow = always
+  allow = always
+
+[delta]
+  navigate = true      # use n and N to move between diff sections
+  line-numbers = true  # show line numbers in the diff
+  hyperlinks = true    # make file paths and commit hashes clickable in supported terminals
+  hyperlinks-file-link-format = "vscode://file/{path}:{line}"
 
 [alias]
   a = add
@@ -33,6 +53,7 @@
   b = branch
   c = commit
   m = merge
+  mc = merge --continue
   co = checkout    # Checkout
   cb = checkout -b # Checkout branch
   sw = switch      # Change branch
@@ -51,8 +72,12 @@
   develop = !git checkout develop && git pull --prune
 
   # Merge latest master/main to current branch
-  remaster = !git checkout master && git pull --rebase --prune && git checkout - && git merge master
-  remain = !git checkout main && git pull --rebase --prune && git checkout - && git merge main
+  memaster = !git fetch origin master && git merge origin/master
+  memain = !git fetch origin main && git merge origin/main
+
+  # Rebase current branch on latest master/main
+  remaster = !git fetch origin master && git rebase --autostash origin/master
+  remain = !git fetch origin main && git rebase --autostash origin/main
   
   # When doing "git git log" or some such, do not complain about "git"
   git = !git
@@ -87,8 +112,11 @@
   # See how many lines of code you have written today.
   today = diff --shortstat --since="0 day ago"
 
-  # Pull data from remore and push local data
+  # Pull data from remote and push local data
   sync = !git pull && git push
+
+  # Lazygit
+  lazy = !lazygit
 
 # URL shorthands
 [url "git@github.com:"]

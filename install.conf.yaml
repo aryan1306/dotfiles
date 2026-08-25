@@ -21,10 +21,13 @@
       command: git submodule update --init --recursive
 
     - description: Installing zgen
-      command: ./scripts/zgen
+      command: ./scripts/zgen.sh
 
     - description: Scaffolding Project folders
-      command: ./scripts/projects
+      command: ./scripts/projects.sh
 
-    - description: Run ./scripts/bootstrap to bootstrap new machine
-      command: echo "bash $DOTFILES/scripts/bootstrap"
+    - description: Linking Agents instructions
+      command: ./scripts/agents.sh
+
+    - description: Run ./scripts/bootstrap.sh to bootstrap new machine
+      command: echo "bash $DOTFILES/scripts/bootstrap.sh"

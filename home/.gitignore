@@ -22,4 +22,13 @@ bower_components
 
 # Ignore Westorm files
 .idea
+
+# VSCode: Todo extension files
+# https://marketplace.visualstudio.com/items/?itemName=fabiospampinato.vscode-todo-plus
+TODO
+*.todo
+
+# Agents
+.claude/*.local.json
+# Local Claude overrides in nested projects, not just the repo root
 **/.claude/settings.local.json
