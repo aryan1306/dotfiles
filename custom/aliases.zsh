@@ -17,13 +17,12 @@ export CLAUDE_CODE_NO_FLICKER=1
 alias clc="claude"
 
 # ------------------------------------------------------------------------------
-# Notes on aliases deliberately NOT set here
+# Notes
 # ------------------------------------------------------------------------------
 #
-# `rm` — upstream used to alias this to `trash`, which rejects `-rf` and made
-# `rm -rf <dir>` fail outright. That alias has been removed. oh-my-zsh's
-# `common-aliases` plugin now supplies `alias rm='rm -i'` underneath, so bare
-# `rm file` prompts once per file while `rm -rf` still works (-f overrides -i).
-# To get an unprompted `rm` back, uncomment:
+# `rm` is aliased to `trash` by upstream's lib/aliases.zsh, so deletions are
+# recoverable from the macOS Trash. `trash` takes no flags, so `rm -rf <dir>`
+# fails with "Un-recognized argument -rf". Use one of these instead:
 #
-#   alias rm='command rm'
+#   command rm -rf <dir>     # bypass the alias, permanent
+#   trash <dir>              # recoverable, directories included
