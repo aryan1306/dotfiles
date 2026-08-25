@@ -2,7 +2,14 @@
 backup
 
 # Custom files (*sh includes sh, bash, zsh)
-custom/**/*.*sh
+# Upstream ignores all of custom/ so it stays machine-local. This fork tracks it
+# instead — it is where personal aliases live, and they are worth versioning.
+# Anything genuinely machine-specific (or secret) goes in a *.local.zsh file,
+# which stays ignored.
+custom/**/*.local.*sh
+
+# macOS
+.DS_Store
 
 # Home Configs
 home/.config/*

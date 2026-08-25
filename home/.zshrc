@@ -1,3 +1,5 @@
+# Added by ForgeCode installer
+export PATH="/Users/aryan.singhal/.local/bin:$PATH"
 # Amazon Q pre block. Keep at the top of this file.
 [[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # ------------------------------------------------------------------------------
@@ -12,10 +14,19 @@
 # Export path to root of dotfiles repo
 export DOTFILES=${DOTFILES:="$HOME/.dotfiles"}
 
+# Ensure Java 17 is the default
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+export PATH=$JAVA_HOME/bin:$PATH
+# export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+
 # Locale
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
+export PATH=/opt/homebrew/bin:$PATH
+
+# Personal aliases and env live in custom/ (loaded further down via zgen) so
+# that upstream merges never conflict with them.
 
 # Do not override files using `>`, but it's still possible using `>!`
 set -o noclobber
@@ -81,9 +92,6 @@ export TIMEFMT=$'\n================\nCPU\t%P\nuser\t%*U\nsystem\t%*S\ntotal\t%*E
 # ------------------------------------------------------------------------------
 ZSH_DISABLE_COMPFIX=true
 
-# Autoload node version when changing cwd
-zstyle ':omz:plugins:nvm' autoload true
-
 # Use passphase from macOS keychain
 if [[ "$OSTYPE" == "darwin"* ]]; then
   zstyle :omz:plugins:ssh-agent ssh-add-args --apple-load-keychain
@@ -118,7 +126,6 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/command-not-found
     zgen oh-my-zsh plugins/npm
     zgen oh-my-zsh plugins/yarn
-    zgen oh-my-zsh plugins/nvm
     zgen oh-my-zsh plugins/fnm
     zgen oh-my-zsh plugins/extract
     zgen oh-my-zsh plugins/ssh-agent
@@ -127,7 +134,6 @@ if ! zgen saved; then
     zgen oh-my-zsh plugins/vscode
     zgen oh-my-zsh plugins/gh
     zgen oh-my-zsh plugins/common-aliases
-    zgen oh-my-zsh plugins/direnv
     zgen oh-my-zsh plugins/docker
     zgen oh-my-zsh plugins/docker-compose
     zgen oh-my-zsh plugins/node
@@ -166,10 +172,10 @@ fi
 # Init tools
 # ------------------------------------------------------------------------------
 
-# # Per-directory configs
-if command -v direnv >/dev/null 2>&1; then
-  eval "$(direnv hook zsh)"
-fi
+# asdf version manager (0.16+ is a Go binary — nothing to source; it works off
+# ASDF_DATA_DIR from .zshenv plus $ASDF_DATA_DIR/shims on PATH). Completions
+# ship with the Homebrew formula.
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 
 # Like cd but with z-zsh capabilities
 if command -v zoxide >/dev/null 2>&1; then
@@ -205,3 +211,71 @@ fi
 
 # Amazon Q post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
+source /Users/aryan.singhal/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+eval "$(zoxide init zsh)"
+# Added by `rbenv init` on Thu Jan 16 11:24:55 IST 2025
+eval "$(rbenv init - --no-rehash zsh)"
+export PATH=/usr/local/bin:/Users/aryan.singhal/.rbenv/shims:/Users/aryan.singhal/.bun/bin:/Users/aryan.singhal/.bun/bin:/Users/aryan.singhal/.config/yarn/global/node_modules/.bin:/Users/aryan.singhal/.yarn/bin:/Users/aryan.singhal/.dotfiles/bin:/opt/homebrew/bin:/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:/Users/aryan.singhal/.rbenv/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/aryan.singhal/Library/Android/sdk/platform-tools:/Users/aryan.singhal/Library/Android/sdk/tools/bin:/Users/aryan.singhal/Library/Android/sdk/tools:/Users/aryan.singhal/Library/Android/sdk/emulator:/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/usr/local/go/bin
+
+# asdf 0.16+ has no bin/ dir — the binary comes from Homebrew. Only the shims
+# need re-adding here, since the hardcoded PATH above drops what .zshenv set.
+_extend_path "$ASDF_DATA_DIR/shims"
+
+# pnpm — PNPM_HOME is exported from .zshenv; re-add to PATH because the
+# hardcoded `export PATH=...` above drops everything .zshenv set up.
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# opencode
+export PATH=/Users/aryan.singhal/.opencode/bin:$PATH
+
+# kilo
+export PATH=/Users/aryan.singhal/.kilo/bin:$PATH
+
+# >>> forge initialize >>>
+# !! Contents within this block are managed by 'forge zsh setup' !!
+# !! Do not edit manually - changes will be overwritten !!
+
+# Add required zsh plugins if not already present
+if [[ ! " ${plugins[@]} " =~ " zsh-autosuggestions " ]]; then
+    plugins+=(zsh-autosuggestions)
+fi
+if [[ ! " ${plugins[@]} " =~ " zsh-syntax-highlighting " ]]; then
+    plugins+=(zsh-syntax-highlighting)
+fi
+
+# Load forge shell plugin (commands, completions, keybindings) if not already loaded
+if command -v forge >/dev/null 2>&1 && [[ -z "$_FORGE_PLUGIN_LOADED" ]]; then
+    eval "$(forge zsh plugin)"
+fi
+
+# Load forge shell theme (prompt with AI context) if not already loaded
+if command -v forge >/dev/null 2>&1 && [[ -z "$_FORGE_THEME_LOADED" ]]; then
+    eval "$(forge zsh theme)"
+fi
+
+# Disable Nerd Fonts (set during setup - icons not displaying correctly)
+# To re-enable: remove this line and install a Nerd Font from https://www.nerdfonts.com/
+export NERD_FONT=0
+# <<< forge initialize <<<
+
+# Added by Antigravity
+export PATH="/Users/aryan.singhal/.antigravity/antigravity/bin:$PATH"
+
+# Drop cmux's claude wrapper if it was injected without _CMUX_CLAUDE_WRAPPER set
+claude_unwrap() {
+  if typeset -f claude >/dev/null 2>&1 && [[ -z "$_CMUX_CLAUDE_WRAPPER" ]]; then
+    unfunction claude
+  fi
+}
+claude_unwrap
+# Re-check just before each prompt — cmux may inject the wrapper after .zshrc runs
+autoload -Uz add-zsh-hook && add-zsh-hook precmd claude_unwrap
+export PATH="$HOME/.local/bin:$PATH"
+
+# Rust/cargo — re-add after the hardcoded PATH reset above (line ~227) drops it.
+# .cargo/env is idempotent (no-op if already on PATH).
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

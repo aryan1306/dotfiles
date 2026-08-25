@@ -116,5 +116,19 @@
 # [user]
 #   name = Denys Dovhan
 #   email = denysdovhan@gmail.com
+[user]
+	name = Aryan
+	email = aryanchannel@gmail.com
+# Keep this include AFTER [user] above: ~/.gitlocal is untracked and holds
+# machine-specific settings plus any per-directory identity overrides, and a
+# later include must be able to win over the defaults set here.
 [include]
   path = ~/.gitlocal
+[rerere]
+	enabled = true
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[credential]
+	helper = osxkeychain
