@@ -299,3 +299,10 @@ export PATH="$HOME/.local/bin:$PATH"
 # Rust/cargo — re-add after the hardcoded PATH reset above (line ~227) drops it.
 # .cargo/env is idempotent (no-op if already on PATH).
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Homebrew curl (keg-only) ahead of /usr/bin/curl, whose CA bundle Apple hasn't updated.
+# Kept last because the hardcoded PATH above drops what .zshenv set.
+case ":$PATH:" in
+  *":/opt/homebrew/opt/curl/bin:"*) ;;
+  *) export PATH="/opt/homebrew/opt/curl/bin:$PATH" ;;
+esac
