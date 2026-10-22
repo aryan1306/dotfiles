@@ -90,7 +90,7 @@ if _exists eza; then
   alias la='ls -lAh'
 fi
 
-# cat with syntax highlighting
+# Syntax highlighting via `bat`; plain `cat` is left untouched
 # https://github.com/sharkdp/bat
 if _exists bat; then
   # Run to list all themes:
@@ -98,7 +98,6 @@ if _exists bat; then
   export BAT_THEME='base16'
   export BAT_STYLE='full'
   export MANPAGER='bat -plman'
-  alias cat='bat'
 fi
 
 # cd with zsh-z capabilities

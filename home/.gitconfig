@@ -18,7 +18,6 @@
   excludesfile = ~/.gitignore
   attributesfile = ~/.gitattributes
   ignorecase = false
-  pager = delta # brew install git-delta
 
 [branch]
   sort = -committerdate
@@ -31,7 +30,6 @@
   rebase = true
 
 [interactive]
-  diffFilter = delta --color-only
 
 # Automatically resolve conflicts
 # https://x.com/dillon_mulroy/status/1982514256340983981
